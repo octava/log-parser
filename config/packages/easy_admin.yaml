@@ -1,0 +1,9 @@
+easy_admin:
+    entities:
+        NginxAccess:
+            class: App\Entity\NginxAccess
+            disabled_actions: ['new', 'edit', 'delete']
+
+        NginxError:
+            class: App\Entity\NginxError
+            disabled_actions: ['new', 'edit', 'delete']

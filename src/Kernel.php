@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\DependencyInjection\AppExtension;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,6 +28,8 @@ final class Kernel extends BaseKernel
         return dirname(__DIR__).'/var/logs';
     }
 
+
+
     public function registerBundles(): iterable
     {
         $contents = require dirname(__DIR__).'/config/bundles.php';
@@ -35,6 +38,11 @@ final class Kernel extends BaseKernel
                 yield new $class();
             }
         }
+    }
+
+    protected function prepareContainer(ContainerBuilder $container)
+    {
+        parent::prepareContainer($container);
     }
 
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void

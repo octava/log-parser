@@ -1,0 +1,7 @@
+monolog:
+    handlers:
+        import_file:
+            type:     stream
+            level:    info
+            path:     '%kernel.logs_dir%/import_file/import_file.log'
+            channels: import_file

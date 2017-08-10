@@ -1,0 +1,67 @@
+app:
+    badges:
+        severity:
+            debug       : 'success'
+            info        : 'success'
+            notice      : 'default'
+            Notice      : 'info'
+            warn        : 'warning'
+            error       : 'danger'
+            crit        : 'danger'
+            alert       : 'danger'
+            emerg       : 'danger'
+            Notice      : 'info'
+            fatal error : 'danger'
+            parse error : 'danger'
+            Warning     : 'warning'
+        http:
+            1 : 'info'
+            2 : 'success'
+            3 : 'default'
+            4 : 'warning'
+            5 : 'danger'
+    providers:
+        nginx_access:
+            entity: 'App\Entity\NginxAccess'
+            regex: '|^((\S*) )*(\S*) (\S*) (\S*) \[(.*)\] \"(\S*) (.*) (\S*)\" ([0-9]*) (.*)( \"(.*)\" \"(.*)\"( [0-9]*/([0-9]*))*)*$|U'
+            match:
+                date    : 6
+                ip      : 3
+                cmd     : 7
+                url     : 8
+                code    : 10
+                size    : 11
+                referer : 13
+                ua      : 14
+                user    : 5
+            fields:
+                date    : 'date:d/m/Y H:i:s /100'
+                ip      : 'ip:geo'
+                url     : 'txt'
+                code    : 'badge:http'
+                size    : 'numeral:0b'
+                referer : 'link'
+                ua      : 'ua:{os.name} {os.version} | {browser.name} {browser.version}\/100'
+        nginx_error:
+            entity: 'App\Entity\NginxError'
+            regex: '@^(.*)/(.*)/(.*) (.*):(.*):(.*) \[(.*)\] [0-9#]*: \*[0-9]+ (((.*), client: (.*), server: (.*), request: \"(.*) (.*) HTTP.*\", host: \"(.*)\"(, referrer: \"(.*)\")*)|(.*))$@U'
+            match:
+                date     : '[1,"/",2,"/",3," ",4,":",5,":",6]'
+                severity : 7
+                error    : '[10,18]'
+                client   : 11
+                server   : 12
+                method   : 13
+                request  : 14
+                host     : 15
+                referer  : 17
+            fields:
+                date     : 'date:d/m/Y H:i:s /100'
+                severity : 'badge:severity'
+                error    : 'pre'
+                client   : 'ip:http'
+                server   : 'txt'
+                method   : 'txt'
+                request  : 'txt'
+                host     : 'ip:http'
+                referer  : 'link'
