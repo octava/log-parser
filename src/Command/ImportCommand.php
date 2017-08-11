@@ -37,6 +37,7 @@ class ImportCommand extends ContainerAwareCommand
 
         if ($this->validation($io, $filename, $providerName)) {
             $message = new ImportFileMessage($filename, $providerName, $input->getOption('truncate'));
+            $message->setSymfonyStyle($io);
             $this->getContainer()->get('command_bus')->handle($message);
         }
     }

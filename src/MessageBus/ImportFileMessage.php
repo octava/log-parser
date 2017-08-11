@@ -2,6 +2,8 @@
 
 namespace App\MessageBus;
 
+use Symfony\Component\Console\Style\SymfonyStyle;
+
 class ImportFileMessage
 {
     /**
@@ -19,11 +21,35 @@ class ImportFileMessage
      */
     protected $truncate;
 
+    /**
+     * @var SymfonyStyle
+     */
+    protected $symfonyStyle;
+
     public function __construct(string $filename, string $providerName, bool $truncate)
     {
         $this->filename = $filename;
         $this->providerName = $providerName;
         $this->truncate = $truncate;
+    }
+
+    /**
+     * @return SymfonyStyle
+     */
+    public function getSymfonyStyle(): SymfonyStyle
+    {
+        return $this->symfonyStyle;
+    }
+
+    /**
+     * @param SymfonyStyle $symfonyStyle
+     * @return self
+     */
+    public function setSymfonyStyle($symfonyStyle)
+    {
+        $this->symfonyStyle = $symfonyStyle;
+
+        return $this;
     }
 
     /**

@@ -60,12 +60,21 @@ class ImportFileHandler
             ['filename' => $message->getFilename(), 'provider' => $provider->getName()]
         );
 
+        $io = $message->getSymfonyStyle();
+        if ($io) {
+            $io->progressStart($this->getLineCount($message->getFilename()));
+        }
+
         $handle = @fopen($message->getFilename(), "r");
         if ($handle) {
             fseek($handle, 0, SEEK_SET);
             $batchSize = 500;
             $i = 0;
             while (($buffer = fgets($handle)) !== false) {
+                if ($io) {
+                    $io->progressAdvance();
+                }
+
                 if ($message->isTruncate() && $i == 0) {
                     $this->truncateTable($provider->getEntityClassName());
                 }
@@ -84,7 +93,9 @@ class ImportFileHandler
             }
             $this->entityManager->flush(); //Persist objects that did not make up an entire batch
             $this->entityManager->clear(); // Detaches all objects from Doctrine!
-
+            if ($io) {
+                $io->progressFinish();
+            }
             if (!feof($handle)) {
                 throw new \RuntimeException('Error: unexpected fgets() fail');
             }
@@ -92,6 +103,14 @@ class ImportFileHandler
         }
 
         $this->logger->debug('parse complete');
+    }
+
+    protected function getLineCount($filename)
+    {
+        $file = new \SplFileObject($filename, 'r');
+        $file->seek(PHP_INT_MAX);
+
+        return $file->key() + 1;
     }
 
     protected function truncateTable($className)
