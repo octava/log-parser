@@ -3,11 +3,19 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 /**
  * NginxError
  *
- * @ORM\Table(name="nginx_error")
+ * @ORM\Table(
+ *     name="nginx_error",
+ *     indexes={
+ *          @Index(name="date_idx", columns={"date"}),
+ *          @Index(name="severity_idx", columns={"severity"}),
+ *          @Index(name="method_idx", columns={"method"}),
+ *     }
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\NginxErrorRepository")
  */
 class NginxError

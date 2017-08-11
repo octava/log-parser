@@ -70,25 +70,41 @@ class ImportFileHandler
             fseek($handle, 0, SEEK_SET);
             $batchSize = 500;
             $i = 0;
+            $tempObjects = [];
             while (($buffer = fgets($handle)) !== false) {
-                if ($io) {
-                    $io->progressAdvance();
-                }
-
                 if ($message->isTruncate() && $i == 0) {
                     $this->truncateTable($provider->getEntityClassName());
                 }
 
                 $tokens = $this->logParser->parseLine($buffer, $provider);
+                if (!$tokens) {
+                    $this->logger->error('Something wrong with line', ['line' => $buffer]);
+                    continue;
+                }
                 $this->logger->debug('', $tokens);
 
                 $i++;
                 $entity = $this->makeEntity($provider->getEntityClassName(), $tokens);
                 $this->entityManager->persist($entity);
+
+                // IMPORTANT - Temporary store entities (of course, must be defined first outside of the loop)
+                $tempObjects[] = $entity;
                 if (($i % $batchSize) === 0) {
                     $this->entityManager->flush();
-                    $this->entityManager->clear(); // Detaches all objects from Doctrine!
+                    // IMPORTANT - clean entities
+                    foreach ($tempObjects as $tempObject) {
+                        $this->entityManager->detach($tempObject);
+                    }
+
                     $this->logger->debug('flush', ['i' => $i, 'batch_size' => $batchSize]);
+
+                    if ($io) {
+                        $io->progressAdvance($batchSize);
+                    }
+
+                    $tempObjects = [];
+                    gc_enable();
+                    gc_collect_cycles();
                 }
             }
             $this->entityManager->flush(); //Persist objects that did not make up an entire batch

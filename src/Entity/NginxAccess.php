@@ -3,12 +3,21 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 /**
  * NginxAccess
  *
- * @ORM\Table(name="nginx_access")
- * @ORM\Entity(repositoryClass="App\Repository\NginxAccessRepository")
+ * @ORM\Table(
+ *     name="nginx_accesst",
+ *     indexes={
+ *          @Index(name="date_idx", columns={"date"}),
+ *          @Index(name="code_idx", columns={"code"}),
+ *     }
+ * )
+ * @ORM\Entity(
+ *     repositoryClass="App\Repository\NginxAccessRepository",
+ * )
  */
 class NginxAccess
 {
@@ -52,7 +61,7 @@ class NginxAccess
     /**
      * @var string
      *
-     * @ORM\Column(name="size", type="decimal", precision=10, scale=10, nullable=true)
+     * @ORM\Column(name="size", type="float", nullable=true)
      */
     private $size;
 
