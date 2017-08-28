@@ -70,7 +70,7 @@ class ImportFileHandler
             fseek($handle, 0, SEEK_SET);
             $batchSize = 500;
             $i = 0;
-            $tempObjects = [];
+            $this->entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
             while (($buffer = fgets($handle)) !== false) {
                 if ($message->isTruncate() && $i == 0) {
                     $this->truncateTable($provider->getEntityClassName());
@@ -91,18 +91,13 @@ class ImportFileHandler
                 $tempObjects[] = $entity;
                 if (($i % $batchSize) === 0) {
                     $this->entityManager->flush();
-                    // IMPORTANT - clean entities
-                    foreach ($tempObjects as $tempObject) {
-                        $this->entityManager->detach($tempObject);
-                    }
-
+                    $this->entityManager->clear();
                     $this->logger->debug('flush', ['i' => $i, 'batch_size' => $batchSize]);
 
                     if ($io) {
                         $io->progressAdvance($batchSize);
                     }
 
-                    $tempObjects = [];
                     gc_enable();
                     gc_collect_cycles();
                 }
